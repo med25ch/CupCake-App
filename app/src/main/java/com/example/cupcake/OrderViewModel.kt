@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
+
+private const val PRICE_PER_CUPCAKE = 2.00
+private const val SAME_DAY_PICK_UP_EXTRA = 3.00
 class OrderViewModel : ViewModel(){
 
     private val _quantity = MutableLiveData<Int>()
@@ -22,6 +25,7 @@ class OrderViewModel : ViewModel(){
 
     fun setQuantity(numberCupcakes: Int){
         _quantity.value = numberCupcakes
+        updatePrice()
     }
 
     fun setFlavor(desiredFlavor: String){
@@ -30,6 +34,7 @@ class OrderViewModel : ViewModel(){
 
     fun setDate(pickupDate: String){
         _date.value = pickupDate
+        updatePrice()
     }
 
     val dateOptions = getPickupOptions()
@@ -43,6 +48,17 @@ class OrderViewModel : ViewModel(){
         _flavor.value = ""
         _date.value = dateOptions[0]
         _price.value = 0.0
+    }
+
+    private fun updatePrice() {
+        _price.value =  (quantity.value ?:0)* PRICE_PER_CUPCAKE
+        if(isSameDayPickUp()){
+            _price.value = _price.value!! + SAME_DAY_PICK_UP_EXTRA
+        }
+    }
+
+    private fun isSameDayPickUp(): Boolean {
+        return date.value == dateOptions[0]
     }
 
     fun hasNoFlavorSet(): Boolean {
